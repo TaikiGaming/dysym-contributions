@@ -20,6 +20,7 @@ local function DefaultSlashBehaviour(self: Types.Ability)
 				Damage = self.Damage,
 				Reason = "Slash Attack",
 				ExecuteOnKill = true,
+				Connections = self.Connections,
 			})
 		end)
 	else
