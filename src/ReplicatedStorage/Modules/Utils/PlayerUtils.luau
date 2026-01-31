@@ -3,6 +3,7 @@ local Players = game:GetService("Players")
 local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local RunService = game:GetService("RunService")
 local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
 
 local Types = require(ReplicatedStorage.Classes.Types)
 local InstanceUtils = require(script.Parent.InstanceUtils)
@@ -412,5 +413,45 @@ function PlayerUtils.ShakeCameraOf(Target: Player | {Player}, Magnitude: number,
     end
     Network:FireClientConnection(Target, "ShakeCamera", "REMOTE_EVENT", Magnitude, Duration)
 end
+
+--- CLIENT FUNCTION: Starts or stops listening for a double-tap of a key.
+--- When double-tap is detected, fires "DoubleTapResponse" to server with the action name.
+function PlayerUtils.DoubleTapListen(actionName: string, shouldListen: boolean, keyCode: Enum.KeyCode?, interval: number?)
+    if RunService:IsServer() then return end
+    
+    PlayerUtils._doubleTapConnections = PlayerUtils._doubleTapConnections or {}
+    
+    if PlayerUtils._doubleTapConnections[actionName] then
+        PlayerUtils._doubleTapConnections[actionName]:Disconnect()
+        PlayerUtils._doubleTapConnections[actionName] = nil
+    end
+    
+    if not shouldListen then return end
+    
+    local key = keyCode or Enum.KeyCode.Space
+    local tapInterval = interval or 0.5
+    local lastTime = 0
+    
+    PlayerUtils._doubleTapConnections[actionName] = UserInputService.InputBegan:Connect(function(input, gpe)
+        if gpe then return end
+        if input.KeyCode ~= key then return end
+        
+        local now = os.clock()
+        if now - lastTime < tapInterval then
+            Network:FireServerConnection("DoubleTapResponse", "REMOTE_EVENT", actionName)
+            lastTime = 0
+        else
+            lastTime = now
+        end
+    end)
+end
+
+--- SERVER FUNCTION: Tells a player's client to start or stop listening for a double-tap.
+function PlayerUtils.DoubleTapListenFor(player: Player, actionName: string, shouldListen: boolean, keyCode: string?, interval: number?)
+    if not RunService:IsServer() then return end
+    
+    Network:FireClientConnection(player, "DoubleTapListen", "REMOTE_EVENT", actionName, shouldListen, keyCode, interval)
+end
+
 
 return PlayerUtils

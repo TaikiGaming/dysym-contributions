@@ -90,6 +90,10 @@ function Utils:Init()
 			Utils.Instance.HighlightInstance(instance, duration, color)
 		end)
 
+        Network:SetConnection("DoubleTapListen", "REMOTE_EVENT", function(actionName: string, shouldListen: boolean, keyCode: string?, interval: number?)
+            Utils.Player.DoubleTapListen(actionName, shouldListen, keyCode and Enum.KeyCode[keyCode], interval)
+        end)
+        
         return
     end
 
