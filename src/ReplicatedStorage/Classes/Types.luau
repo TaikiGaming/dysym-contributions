@@ -382,6 +382,15 @@ export type Survivor = {
     --- 
     --- If you want the character to not get affected by the hit, you can return `"Ignored"`.
     OnHit: (self: Survivor, hitbox: HitboxDetails, damage: number) -> (string?)?,
+    --- SERVER FUNCTION: An empty function that you can replace to execute custom behaviour when this character takes damage from any source.
+    --- 
+    --- If you want the character to not take damage, return `"Ignored"`.
+    --- If you want to modify the damage, return a number.
+    OnDamage: (self: Survivor, damageSettings: any) -> (string | number)?,
+    --- SERVER FUNCTION: An empty function that you can replace to execute custom behaviour when an effect is applied to this character.
+    --- 
+    --- If you want to ignore the effect, return `"Ignored"`.
+    OnEffect: (self: Survivor, effectSettings: any) -> (string?)?,
 }
 
 --- Type used for killer characters.
@@ -733,6 +742,15 @@ export type Killer = {
     --- 
     --- If you want the character to not get affected by the hit, you can return `"Ignored"`.
     OnHit: (self: Killer, hitbox: any, damage: number) -> (string?)?,
+    --- SERVER FUNCTION: An empty function that you can replace to execute custom behaviour when this character takes damage from any source.
+    --- 
+    --- If you want the character to not take damage, return `"Ignored"`.
+    --- If you want to modify the damage, return a number.
+    OnDamage: (self: Killer, damageSettings: any) -> (string | number)?,
+    --- SERVER FUNCTION: An empty function that you can replace to execute custom behaviour when an effect is applied to this character.
+    --- 
+    --- If you want to ignore the effect, return `"Ignored"`.
+    OnEffect: (self: Killer, effectSettings: any) -> (string?)?,
     --- SERVER FUNCTION: An empty function that you can replace to execute custom behaviour when this character executes a survivor (the animation MUST be set).
     OnExecution: ((self: Killer, victim: Model, usedAnimName: string) -> ())?,
 }

@@ -113,7 +113,22 @@ function CommonFunctions.DamagePlayer(DamageSettings: DamagePlayerSettings)
 		if ResistanceValue then
 			DamageSettings.Damage /= 0.1 * ResistanceValue + 1 --since lvl 1 should do the trick already
 		end
-
+		
+		-- "John Doe, scream if you love The Masquerade." "RAAGGGGGGHHHHHH"
+		if Char:GetAttribute("CharacterName") then
+		    local CharacterModule = require(Char.PlayerAbilities.CharacterAbilities).CharacterModule
+		    
+		    if CharacterModule and CharacterModule.OnDamage then
+		        local result = CharacterModule:OnDamage(DamageSettings)
+		        
+		        if result == "Ignored" then
+		            return
+		        elseif type(result) == "number" then
+		            DamageSettings.Damage = result
+		        end
+		    end
+		end
+	                
 		Network:FireClientConnection(DamageSettings.SourcePlayer, "DisplayHitmarker", "REMOTE_EVENT", targetPos, DamageSettings.Damage)
 		if Utils.PlayerData.GetPlayerSetting(DamageSettings.SourcePlayer, "Miscellaneous.ImageFlashOnHit") then
 			Network:FireClientConnection(DamageSettings.SourcePlayer, "ShowJokeSettingImage", "REMOTE_EVENT", false, DamageSettings.SourcePlayer.Character.Role.Value)
@@ -200,6 +215,24 @@ function CommonFunctions.ApplyEffect(EffectSettings: ApplyEffectSettings) : Numb
 		EffectValue:SetAttribute("Subfolder", EffectSettings.EffectSettings.Subfolder)
 	end
 	EffectValue:SetAttribute("Duration", EffectSettings.EffectSettings.Duration or EffectModule.Duration)
+	
+	EffectSettings.EffectSettings.Duration = EffectValue:GetAttribute("Duration")
+	
+	-- #SufferingFromSuccess - Taiki/Yuika
+    if char:GetAttribute("CharacterName") then
+        local CharacterModule = require(char.PlayerAbilities.CharacterAbilities).CharacterModule
+        
+        if CharacterModule and CharacterModule.OnEffect then
+            local result = CharacterModule:OnEffect(EffectSettings)
+            
+            if result == "Ignored" then
+                return
+            end
+            
+            EffectValue:SetAttribute("Duration", EffectSettings.EffectSettings.Duration)
+            
+        end
+    end
 
 	EffectValue.Parent = CharEffects
 	

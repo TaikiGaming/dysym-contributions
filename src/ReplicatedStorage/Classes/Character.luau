@@ -67,6 +67,8 @@ function CharTypes.GetDefaultSurvivorSettings(): Types.Survivor
 
         OnInit = nil,
         OnHit = nil,
+        OnDamage = nil,
+        OnEffect = nil,
     }
 end
 
@@ -141,6 +143,8 @@ function CharTypes.GetDefaultKillerSettings(): Types.Killer
 
         OnInit = nil,
         OnHit = nil,
+        OnDamage = nil,
+        OnEffect = nil,
         OnExecution = nil,
     }
 end
